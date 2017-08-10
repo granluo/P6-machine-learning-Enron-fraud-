@@ -7,7 +7,7 @@
 
 The goal of this project is to detect persons-of-interest, POIs, based on the
 Enron email dataset. This public dataset contains financial and email data
-due to the Euron scandal. This dataset also include a list of persons of interest
+due to the Enron scandal. This dataset also include a list of persons of interest
 in this fraud case.
 
 ## Dataset Overview
@@ -40,12 +40,15 @@ bonus| 0.44
     total_payments| 0.14
     total_stock_value| 0.14
 
-In this dataset, we have 20 features and one labels, poi, which is a Boolean to identify if this person is a person of interest or not.
+In this dataset, we have 20 features and one labels, poi, which is a Boolean to
+identify if this person is a person of interest or not.
 
 ## Outliers and bad data
 
-* `TOTAL` data was removed since `TOTAL` is not a person but the summary of data and it is an outliers
-* `BELFER ROBERT` and `BHATNAGAR SANJAY` were updated with the correct data to correspond to PDF
+* `TOTAL` data was removed since `TOTAL` is not a person but the summary of data
+ and it is an outliers
+* `BELFER ROBERT` and `BHATNAGAR SANJAY` were updated with the correct data to
+correspond to PDF
 * `LOCKHART EUGENE E` is removed since all features are `Nan`.
 
 ## Additional features and removed features
@@ -94,7 +97,13 @@ Features  | importances
 
 
   * SelectKBest
-      * I used all features and labels to run SelectKBest by computing ANOVA F-value for each feature and pick the first 10 features.
+      * I used `SelectKBest` to pick k features, k from 1 to 20, seperately and combine with features selected from `DecisionTreeClassifier`
+      * 20 combinations are applied in training a decision tree model and the k that has the best precision and recall will be picked
+        * Best k followed two criterions
+          * Both precision and recall are larger than 0.3
+          * The sum of precision and recall is the largest among 20 all ks
+        * The final k is 3        
+      * I used all features and labels to run SelectKBest by computing ANOVA F-value for each feature and pick the first 3 features.
       * Features marked as bold are picked .
 
 Features  | Score
@@ -102,13 +111,13 @@ Features  | Score
       __total_stock_value__ | 22.782107829734311
        __exercised_stock_options__ | 22.610530706873771
        __bonus__ | 21.060001707536571
-       __ratio_to_poi__ | 16.641707070468989
-       __deferred_income__ | 11.561887713503024
-       __long_term_incentive__ | 10.072454529369441
-       __total_payments__ | 9.3802367968115874
-       __restricted_stock__ | 8.9649639563000818
-       __shared_receipt_with_poi__ | 8.7464855321290802
-       __loan_advances__ | 7.2427303965360181
+       ratio_to_poi | 16.641707070468989
+       deferred_income | 11.561887713503024
+       long_term_incentive | 10.072454529369441
+       total_payments | 9.3802367968115874
+       restricted_stock | 8.9649639563000818
+       shared_receipt_with_poi | 8.7464855321290802
+       loan_advances | 7.2427303965360181
        expenses| 5.5506837757329741
        from_poi_to_this_person| 5.3449415231473374
        other| 4.2198879086807812
@@ -136,7 +145,7 @@ Features  | Score
   `restricted_stock`,
   `long_term_incentive`
 
-## classifiers
+## Classifiers
 
 I evaluated the following algorithms:
 
