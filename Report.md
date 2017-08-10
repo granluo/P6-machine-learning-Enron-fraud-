@@ -169,12 +169,19 @@ Since this is a supervised learning and variances in features and clustering may
 
 Precision, recall and f1 here and below are all for `poi` with True value.
 
+Precision is the proportion of POIs correctly classified among all people the model
+marks as POIs, and recall is the proportion of POIs correctly classified among
+all true POIs.
+
 As the table showed above, naive bayes, decision tree and random forest have satisfied the requirement of this project, both precision and recall larger than 0.3. I will pick decision tree for this project due to its high f1 score.
 
 ## Feature scaling
 
 
 Since we have some financial features that can be as high as millions, I used `MinMaxScaler` to scale the features for `SVM rbf` and `SVM linear`. The large scale of the features could be one reason why SVM has lower outcome, so I scale the features to see if that can help SVM get a better result.
+
+
+
 
 algorithm | accuracy | precision | recall |       f1
 ----------|--------|-----------|--------|----------|
@@ -186,6 +193,8 @@ Random Forest | 0.886364 |  0.500000 |    0.2 | 0.285714
     Ada Boost | 0.840909 |  0.250000 |    0.2 | 0.222222
 
 However, SVM improved but not that much. I will pick decision tree due to its high precision and recall. Though scale does not affect decision tree, I will leave the data as shown in the beginning for better interpretations.
+
+
 
 ## Metrics
 
@@ -253,7 +262,10 @@ I will pick the depth with 3 to avoid overfitting.
 
 ## Outcome
 
-The precision of the model is 0.48533	and the recall is 0.43000, both more than 0.3 and satisfying the requirements.
+The precision of the model was 0.48533, which meant among all pois them model
+predicts, 48.5 percent of them were correct. And the recall was 0.43000, so 43
+percent of pois were correctely founded among all POIs. These two criterions were
+both more than 0.3 and satisfying the requirements.
 
  -|-
 --|--
