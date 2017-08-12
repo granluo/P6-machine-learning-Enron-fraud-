@@ -62,6 +62,10 @@ I add these two features because these two features can represent the percentage
 I also deleted some features:
 * `email_address`: the Email address of person on the list.
 
+## Main methods for solving this problem
+
+I used machine learning to deal with this problem, since, in this dataset, we do not have a large size of sample, and the number of person of interest is very small. There is no one or two features that are very related to POIs and in this case, we cannot simply use linear regression with one or two variables. Machine learning, hence, is very necessary to be applied in this problem. 
+
 ## Features selection
 
 I used decision tree to find importance of each feature and then features with importance not 0 will be selected.
@@ -69,6 +73,9 @@ Also I use `SelectKBest` to pick features most related to `poi`. I picked top 10
 
 * Decision tree
   * I used all features and labels to train the decision tree and get the following importances.
+  * Features with importances more than 0 are picked
+      * Importances here are entropies of features in this tree.
+      * A higher entropy means this features has higher impurity, so this features contain more information of POIs.
   * Features marked as bold are picked
 
 Features  | importances
@@ -103,6 +110,32 @@ Features  | importances
           * Both precision and recall are larger than 0.3
           * The sum of precision and recall is the largest among 20 all ks
         * The final k is 3        
+
+k in skb |  precision |  recall
+---------|------------|---------
+1 | 0.4 | 0.4
+2 | 0.5 | 0.4
+3 | 0.5 | 0.8
+4 | 0.5 | 0.8
+5 | 0.5 | 0.8
+6 | 0.5 | 0.8
+7 | 0.5 | 0.8
+8 | 0.5 | 0.8
+9 | 0.5 | 0.8
+10 | 0.5 |  0.8
+ 11 | 0.5 |  0.8
+ 12 | 0.5 |  0.8
+ 13 | 0.5 |  0.8
+ 14 | 0.5 |  0.8
+ 15 | 0.5 |  0.8
+ 16 | 0.5 |  0.8
+ 17 | 0.4 |  0.4
+ 18 | 0.4 |  0.4
+ 19 | 0.5 |  0.8
+
+Since after 3, precisions and recalls cannot get better, larger than the ones of k with 3, I will pick 3 for the final k for a concise model.
+
+
       * I used all features and labels to run SelectKBest by computing ANOVA F-value for each feature and pick the first 3 features.
       * Features marked as bold are picked .
 
@@ -238,7 +271,7 @@ We can see that the train score is increasing with the increasing max depth, but
 
 ## Validation and cross-validation
 
-Validation means a model trained by training set is ran on a  different data, which is a test set. If it does not work well on the test set, this model might be overfitted. New data might not work well on this model.
+Validation means a model trained by training set is ran on a | different data, which is a test set. If it does not work well on the test set, this model might be overfitted. New data might not work well on this model.
 
 Based on what we have for models, 146 observations, I used cross-validation to do the verification for the decision tree model and also try to find out the best max depth for the model.
 
