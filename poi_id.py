@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#!/usr/bin/env python -W ignore::DeprecationWarning
 
 import sys
 import pickle
@@ -223,10 +224,11 @@ from sklearn.cross_validation import train_test_split
  has the best precision and recall, both larger than 0.3, and the sum is the
  largest.
  '''
+import pandas as pd
 def get_k(num_iter, mds = my_dataset, feature = ALL_FEATURES, label = ALL_LABELS):
     best_k_skb = 0
     best_pr_score = 0
-
+    record = pd.DataFrame(columns = ['k in skb','precision','recall'])
     clf = DecisionTreeClassifier(criterion="entropy", max_depth=5, random_state=43)
     for i in range(1,num_iter):
         features_list = selected_features(feature,label,i)
@@ -241,17 +243,23 @@ def get_k(num_iter, mds = my_dataset, feature = ALL_FEATURES, label = ALL_LABELS
         prf = precision_recall_fscore_support(labels_test,clf.predict(features_test))
         precision = prf[0][1]
         recall = prf[1][1]
+        record.loc[len(record)] = [int(i), precision, recall]
         # print precision , ' ', recall
         if (precision > 0.3) and (recall>0.3) and ((precision + recall)>best_pr_score):
             best_pr_score =precision + recall
             best_k_skb = i
-    return best_k_skb
+    return {'best k skb': best_k_skb, 'Importance':record}
 
-bestk = get_k(20)
+getk = get_k(20)
+bestk = getk['best k skb']
+importance = getk['Importance']
+
 # print out selectkbest score
 skb_features = skb_select_feature(features, labels,bestk)
 features_importances = skb_features['features_importances']
 skb_feature_list = skb_features['selected_features']
+print 'Importance of k features selected by SelectKBest'
+pp.pprint(importance)
 pp.pprint(features_importances)
 pp.pprint(skb_features)
 print " the best k skb is ",  bestk
