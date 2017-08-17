@@ -10,6 +10,10 @@ Enron email dataset. This public dataset contains financial and email data
 due to the Enron scandal. This dataset also include a list of persons of interest
 in this fraud case.
 
+## Why machine learning?
+
+I used machine learning to deal with this problem, since, in this dataset, we do not have a large size of sample, and the number of person of interest is very small. There is no one or two features that are very related to POIs and in this case, we cannot simply use linear regression with one or two variables. POIs could be related to many factors and these factors may or may not be correlated, so the model for predicting POIs could be complex. Machine learning can refine the model based on datasets we have. Machine learning, hence, is very necessary to be applied in this problem. In this project, I will try to find a best-fit model for prediction by cleaning outliers, selecting features, selecting models and tuning parameters.
+
 ## Dataset Overview
 
 * The number of observations: 146
@@ -62,9 +66,6 @@ I add these two features because these two features can represent the percentage
 I also deleted some features:
 * `email_address`: the Email address of person on the list.
 
-## Main methods for solving this problem
-
-I used machine learning to deal with this problem, since, in this dataset, we do not have a large size of sample, and the number of person of interest is very small. There is no one or two features that are very related to POIs and in this case, we cannot simply use linear regression with one or two variables. Machine learning, hence, is very necessary to be applied in this problem. 
 
 ## Features selection
 
