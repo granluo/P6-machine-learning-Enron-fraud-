@@ -132,8 +132,19 @@ features_list += ['ratio_from_poi', 'ratio_to_poi']
 
 my_dataset = data_dict
 data = featureFormat(my_dataset, features_list, sort_keys=True)
+print data
 ALL_LABELS, ALL_FEATURES = labels, features = targetFeatureSplit(data)
 print 'number of features', len(features[0])
+
+
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn.cross_validation import train_test_split
+
+features_train, features_test, labels_train, labels_test = \
+train_test_split( features ,labels,
+                 test_size=0.3, random_state=42)
+
+data_train_set, _ = train_test_split( data, test_size=0.3, random_state=42)
 
 
 # print my_dataset
@@ -160,7 +171,7 @@ def feature_scaling(data_dictionary=data_dict, range_threshold=10000000, f=featu
 
 
 print '##############  Find Best Features  ##############'
-print '##############  Decesion Tree  ##############'
+print '##############  Decision Tree  ##############'
 print 'features with importances larger than 0 are selected'
 # Use decision tree to find importances of features
 
@@ -182,7 +193,7 @@ def dt_select_feature(features, labels):
     'features_importances':sorted_features_importance # a list of tuple containing features' names and features' importances
     })
 # pp.pprint (sorted_features_importance) # print sorted importances of features of the decision tree
-dtc_features = dt_select_feature(features, labels)
+dtc_features = dt_select_feature(features_train, labels_train)
 features_importances = dtc_features['features_importances']
 dtc_feature_list = dtc_features['selected_features']
 pp.pprint(features_importances)
@@ -210,12 +221,9 @@ print '##############  Features Selected  ##############'
 def selected_features(features,labels,sk_best):
     skb_features = skb_select_feature(features, labels, sk_best)
     dtc_features = dt_select_feature(features, labels)
-
     return ['poi'] + list(set(skb_features['selected_features'] + dtc_features['selected_features']))
 
 
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from sklearn.cross_validation import train_test_split
 
 
 '''
@@ -225,22 +233,23 @@ from sklearn.cross_validation import train_test_split
  largest.
  '''
 import pandas as pd
-def get_k(num_iter, mds = my_dataset, feature = ALL_FEATURES, label = ALL_LABELS):
+def get_k(num_iter, mds = data_train_set, feature = ALL_FEATURES, label = ALL_LABELS):
     best_k_skb = 0
     best_pr_score = 0
     record = pd.DataFrame(columns = ['k in skb','precision','recall'])
     clf = DecisionTreeClassifier(criterion="entropy", max_depth=5, random_state=43)
-    for i in range(1,num_iter):
+    for i in range(0,num_iter):
         features_list = selected_features(feature,label,i)
         # pp.pprint (features_list)
-        data = featureFormat(mds, features_list, sort_keys=True)
-        labels_select, features_select = targetFeatureSplit(data)
+        # data = featureFormat(mds, features_list, sort_keys=True)
+        labels_select, features_select = targetFeatureSplit(mds)
         # labels = [int(x) for x in labels]
         features_train, features_test, labels_train, labels_test = \
-        train_test_split( features_select ,labels_select,
-                         test_size=0.3, random_state=42)
+        train_test_split(features_select,labels_select,
+                         test_size=0.3,random_state = 142)
         clf.fit(features_train,labels_train)
         prf = precision_recall_fscore_support(labels_test,clf.predict(features_test))
+
         precision = prf[0][1]
         recall = prf[1][1]
         record.loc[len(record)] = [int(i), precision, recall]
@@ -263,11 +272,11 @@ pp.pprint(importance)
 pp.pprint(features_importances)
 pp.pprint(skb_features)
 print " the best k skb is ",  bestk
-
+pp.pprint(dtc_feature_list)
 
 
 features_list =selected_features(features,labels,bestk)
-pp.pprint(selected_features(features,labels,bestk))
+pp.pprint(features_list)
 
 # Task 3: Create new feature(s)
 # Store to my_dataset for easy export below.
@@ -437,23 +446,40 @@ print pd.DataFrame(
 record_tree = pd.DataFrame(
     columns=['algorithm', 'accuracy', 'precision', 'recall', 'f1'])
 set_num = 0
-from sklearn.cross_validation import KFold
-kf = KFold(len(features_train), 4)
+# from sklearn.cross_validation import KFold
 
 
 # This function is to store indicies for each fold, in tuple, from kfold into list
-def kfold_sets_index(num_of_features, num_folds):
-    kf = KFold(num_of_features, num_folds)
+# def kfold_sets_index(num_of_features, num_folds):
+#     kf = KFold(num_of_features, num_folds)
+#     sets_list = []
+#     for train_indices, test_indices in kf:
+#         # print('train:',train_index,'test:', test_index)
+#         features_train_cv = [features_train[ii] for ii in train_indices]
+#         features_test_cv = [features_train[ii] for ii in test_indices]
+#         labels_train_cv = [labels_train[ii] for ii in train_indices]
+#         labels_test_cv = [labels_train[ii] for ii in test_indices]
+#         sets_list.append((features_train_cv, features_test_cv,
+#                           labels_train_cv, labels_test_cv))
+#     return sets_list
+
+# use training set for cross_validation
+from sklearn.model_selection import StratifiedShuffleSplit
+sss = StratifiedShuffleSplit(n_splits = 4, test_size = 0.1)
+def sss_sets_index(num_splits, test_set_size,features = features_train,labels = labels_train):
+    sss = StratifiedShuffleSplit(n_splits = num_splits, test_size = test_set_size)
+
     sets_list = []
-    for train_indices, test_indices in kf:
+    for train_indices, test_indices in sss.split(features,labels):
         # print('train:',train_index,'test:', test_index)
-        features_train_cv = [features_train[ii] for ii in train_indices]
-        features_test_cv = [features_train[ii] for ii in test_indices]
-        labels_train_cv = [labels_train[ii] for ii in train_indices]
-        labels_test_cv = [labels_train[ii] for ii in test_indices]
+        features_train_cv = [features[ii] for ii in train_indices]
+        features_test_cv = [features[ii] for ii in test_indices]
+        labels_train_cv = [labels[ii] for ii in train_indices]
+        labels_test_cv = [labels[ii] for ii in test_indices]
         sets_list.append((features_train_cv, features_test_cv,
                           labels_train_cv, labels_test_cv))
     return sets_list
+
 
 
 for j in (range(3, 11, 1)):
@@ -461,7 +487,7 @@ for j in (range(3, 11, 1)):
         criterion="entropy", max_depth=j, random_state=43)
     prf_mean = []
     prf = []
-    for i in kfold_sets_index(len(features_train), 50):
+    for i in sss_sets_index(4, 0.1):
         # print i
         features_train_cv, features_test_cv, labels_train_cv, labels_test_cv = i
 
