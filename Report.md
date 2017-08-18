@@ -77,6 +77,8 @@ Also I use `SelectKBest` to pick features most related to `poi`. I picked top 10
   * Features with importances more than 0 are picked
       * Importances here are entropies of features in this tree.
       * A higher entropy means this features has higher impurity, so this features contain more information of POIs.
+      * More information means this feature can better split POIs and non-POIs.
+      * Since features with importances of 0 could be helpful to classifications, but not for this decision tree model, I will use `SelectKBest` to add features later.
   * Features marked as bold are picked
 
 Features  | importances
@@ -106,55 +108,56 @@ Features  | importances
 
   * SelectKBest
       * I used `SelectKBest` to pick k features, k from 1 to 20, seperately and combine with features selected from `DecisionTreeClassifier`
-      * 20 combinations are applied in training a decision tree model and the k that has the best precision and recall will be picked
+      * 20 combinations are applied in training a decision tree model, whose training set and test set both from the training set of the original dataset, and the k that has the best precision and recall will be picked
         * Best k followed two criterions
           * Both precision and recall are larger than 0.3
           * The sum of precision and recall is the largest among 20 all ks
-        * The final k is 3        
+        * The final k is 0        
 
-k in skb |  precision |  recall
----------|------------|---------
-1 | 0.4 | 0.4
-2 | 0.5 | 0.4
-3 | 0.5 | 0.8
-4 | 0.5 | 0.8
-5 | 0.5 | 0.8
-6 | 0.5 | 0.8
-7 | 0.5 | 0.8
-8 | 0.5 | 0.8
-9 | 0.5 | 0.8
-10 | 0.5 |  0.8
- 11 | 0.5 |  0.8
- 12 | 0.5 |  0.8
- 13 | 0.5 |  0.8
- 14 | 0.5 |  0.8
- 15 | 0.5 |  0.8
- 16 | 0.5 |  0.8
- 17 | 0.4 |  0.4
- 18 | 0.4 |  0.4
- 19 | 0.5 |  0.8
+|  k in skb |  precision|  recall|
+|------|----------|----------------|
+| 0 | 0.333333 | 0.25 |
+| 1 | 0.333333 | 0.25 |
+| 2 | 0.333333 | 0.25 |
+| 3 | 0.333333 | 0.25 |
+| 4 | 0.333333 | 0.25 |
+| 5 | 0.333333 | 0.25 |
+| 6 | 0.333333 | 0.25 |
+| 7 | 0.333333 | 0.25 |
+| 8 | 0.333333 | 0.25 |
+| 9 | 0.333333 | 0.25 |
+| 10 | 0.333333 | 0.25 |
+| 11 | 0.333333 | 0.25 |
+| 12 | 0.333333 | 0.25 |
+| 13 | 0.333333 | 0.25 |
+| 14 | 0.333333 | 0.25 |
+| 15 | 0.333333 | 0.25 |
+| 16 | 0.333333 | 0.25 |
+| 17 | 0.333333 | 0.25 |
+| 18 | 0.333333 | 0.25 |
+| 19 | 0.333333 | 0.25 |
 
-Since after 3, precisions and recalls cannot get better, larger than the ones of k with 3, I will pick 3 for the final k for a concise model.
+We can see in `SelectKBest`, more features cannot improve the result and the precision and recall keep the same. In this case, I will only use features from the decision tree model. In other words, I will select 0 features from `SelectKBest`.
 
 
-      * I used all features and labels to run SelectKBest by computing ANOVA F-value for each feature and pick the first 3 features.
-      * Features marked as bold are picked .
+      * I used features and labels of the training set to run SelectKBest by computing ANOVA F-value for each feature.
+      * ANOVA F Scores of features
 
 Features  | Score
       --------------|------------
       __total_stock_value__ | 22.782107829734311
        __exercised_stock_options__ | 22.610530706873771
        __bonus__ | 21.060001707536571
-       ratio_to_poi | 16.641707070468989
-       deferred_income | 11.561887713503024
-       long_term_incentive | 10.072454529369441
-       total_payments | 9.3802367968115874
-       restricted_stock | 8.9649639563000818
-       shared_receipt_with_poi | 8.7464855321290802
-       loan_advances | 7.2427303965360181
-       expenses| 5.5506837757329741
-       from_poi_to_this_person| 5.3449415231473374
-       other| 4.2198879086807812
+       __ratio_to_poi__ | 16.641707070468989
+       __deferred_income__ | 11.561887713503024
+       __long_term_incentive__ | 10.072454529369441
+       __total_payments__ | 9.3802367968115874
+       __restricted_stock__ | 8.9649639563000818
+       __shared_receipt_with_poi__ | 8.7464855321290802
+       __loan_advances__ | 7.2427303965360181
+       __expenses__ | 5.5506837757329741
+       __from_poi_to_this_person__ | 5.3449415231473374
+       __other__ | 4.2198879086807812
        ratio_from_poi| 3.2107619169667441
        from_this_person_to_poi| 2.4265081272428781
        director_fees| 2.1127619890604508
@@ -166,18 +169,16 @@ Features  | Score
   * Selected features
     * I combined these two group of features and get the new group of features for training the model.
     * Features:
-    `total_payments`,
-  `loan_advances`,
-  `bonus`,
-  `total_stock_value`,
-  `shared_receipt_with_poi`,
-  `exercised_stock_options`,
-  `ratio_to_poi`,
-  `other`,
-  `deferred_income`,
-  `expenses`,
-  `restricted_stock`,
-  `long_term_incentive`
+   `poi `,
+   `total_payments `,
+   `shared_receipt_with_poi `,
+   `exercised_stock_options `,
+   `ratio_to_poi `,
+   `other `,
+   `expenses `,
+   `restricted_stock `
+
+
 
 ## Classifiers
 
@@ -203,9 +204,6 @@ Since this is a supervised learning and variances in features and clustering may
 
 Precision, recall and f1 here and below are all for `poi` with True value.
 
-Precision is the proportion of POIs correctly classified among all people the model
-marks as POIs, and recall is the proportion of POIs correctly classified among
-all true POIs.
 
 As the table showed above, naive bayes, decision tree and random forest have satisfied the requirement of this project, both precision and recall larger than 0.3. I will pick decision tree for this project due to its high f1 score.
 
@@ -276,7 +274,7 @@ Validation means a model trained by training set is ran on a | different data, w
 
 Based on what we have for models, 146 observations, I used cross-validation to do the verification for the decision tree model and also try to find out the best max depth for the model.
 
-The method I used for the model is `KFold`. `KFold` is to split the dataset in to `k` parts on average. One of them will be selected as test set and the rest are going to be in the training set. Since we have `k` parts, we are going to have `k` airs of training and test sets. Since this project has only 146 observations, of which 18 are POIs. I will have the cross-validation over the test and training set.
+The method I used for the model is `StratifiedShuffleSplit`. `StratifiedShuffleSplit` is to shuffle the dataset in to `n` times. For each time, a certain proportion of the data will be selected to be test set and the rest are training set.  Since this project has only 146 observations, of which 18 are POIs. I will have the cross-validation over the test and training set.
 
 In this case, I set `k` as 100, and so I will have 100 pairs of training and test sets. I averaged accuracy, precision, recall of 100 folds for test of each tree and I have the followings
 
@@ -296,23 +294,23 @@ I will pick the depth with 3 to avoid overfitting.
 
 ## Outcome
 
-The precision of the model was 0.48533, which meant among all pois them model
-predicts, 48.5 percent of them were correct. And the recall was 0.43000, so 43
+The precision of the model was 0.53477, which meant among all pois them model
+predicts, 53.5 percent of them were correct. And the recall was 0.48450, so 48.5
 percent of pois were correctely founded among all POIs. These two criterions were
 both more than 0.3 and satisfying the requirements.
 
  -|-
 --|--
-Accuracy| 0.86320
-Precision| 0.48533
-Recall| 0.43000
-F1| 0.45599
-F2|0.44003
+Accuracy| 0.87507
+Precision| 0.53477
+Recall| 0.48450
+F1| 0.50839
+F2|0.49378
 Total predictions| 15000
-True positives|  860
-False positives|  912
-False negatives| 1140
-True negatives| 12088
+True positives|  969
+False positives|  843
+False negatives| 1031
+True negatives| 12157
 
 
 ## Conclusion
