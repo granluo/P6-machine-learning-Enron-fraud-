@@ -117,7 +117,6 @@ def fraction_poi(data, numerator, denominator, new_feature):
     for i in data:
         data[i][new_feature] = float(data[i][numerator]) / float(
             data[i][denominator]) if data[i][denominator] != 'NaN' else 0.
-        # data[i]['ratio_from_poi'] = float(data[i]['from_poi_to_this_person'])/float(data[i]['from_messages'])
     return data
 
 
