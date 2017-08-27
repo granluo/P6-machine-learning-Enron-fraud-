@@ -4,7 +4,7 @@
 The goal of this project is to detect persons-of-interest, POIs, based on the
 Enron email dataset. This public dataset contains financial and email data
 due to the Enron scandal. This dataset also include a list of persons of interest
-in this fraud case.
+in this fraud case. You are free to check out the project report (right here)[https://github.com/ollkorrect/P6-machine-learning-Enron-fraud-/blob/master/Report.md]
 
 ## Why machine learning?
 
@@ -19,7 +19,6 @@ I used machine learning to deal with this problem, since, in this dataset, we do
 In this dataset, we have 20 features and one labels, poi, which is a Boolean to
 identify if this person is a person of interest or not.
 
-## Models used for 
 ## Additional features and removed features
 
 I added some new features in the dataset.
