@@ -1,4 +1,4 @@
-|# Machine learning of Enron dataset analysis: detect persons-of-interest (POIs)
+# Machine learning of Enron dataset analysis: detect persons-of-interest (POIs)
 
 ### Zongran Luo
 ### Date: 08/01/2017
